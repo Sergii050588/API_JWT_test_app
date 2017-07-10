@@ -6,7 +6,7 @@ Rails.application.routes.draw do
 
   # Search for User model
   get '/users/search/:query' => 'users#search_users'
-  get '/users/email/:email' => 'users#search_user_posts_by_email'
+  get '/users/name/:name' => 'users#search_user_posts_by_name'
 
   #Search for Post model
   get '/posts/search/:query' => 'posts#search_posts'

@@ -5,8 +5,6 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  scope :by_post_count, -> { where("User.posts.count >=", 1) }
-
 
   def downcase_email
     self.email = self.email.delete(' ').downcase
