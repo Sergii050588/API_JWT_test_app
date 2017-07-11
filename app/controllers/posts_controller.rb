@@ -1,11 +1,16 @@
 class PostsController < JSONAPI::ResourceController
   include AuthenticateHelper
-  include Orderable
   respond_to :json
   before_action :authenticate_request!
 
-  has_scope :by_created_at, using: [:from, :to], only: :index
+  has_scope :created, using: [:from, :to, :order], only: :index do |controller, scope, value|
+    scope.created_from(value[0]).created_to(value[1]).created_order(value[2])
+  end
 
+  api :GET, "/posts/search/:query", "Search Posts by :query (name, body, created_at)"
+  param :name, String, :desc => "Name of the post", :required => true
+  param :body, String, :desc => "Body of the post", :required => true
+  error :code => 401, :desc => "Unauthorized"
   def search_posts
     posts_array = []
     if request.get?
@@ -18,11 +23,9 @@ class PostsController < JSONAPI::ResourceController
 
   def index
     @posts = apply_scopes(Post).
-      order(ordering_params(params)).
       all
 
     render json: @posts
   end
 
- 
 end

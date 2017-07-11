@@ -1,22 +1,30 @@
 class UsersController < JSONAPI::ResourceController
   include AuthenticateHelper
-  include Orderable
   respond_to :json
   before_action :authenticate_request!, except: [:create]
 
+  def index
+    @users = User.
+      all.select { |t| t.posts.count > params[:post_counter].to_i }
 
-  def search_users
-    if request.get?
-      user = User.text_search(params[:query])
-    end
-    respond_with user
+    render json: @users
   end
 
-  def search_user_posts_by_name
+  def search_users
+    users_array = []
+    if request.get?
+      user = User.text_search(params[:query]).each do |user|
+        users_array << user
+      end
+    end
+    respond_with users_array
+  end
+
+  def search_user_posts_by_username
     posts_array = []
     if request.get?
-      p = User.find_by_name(params[:name]).posts
-        posts_array << p
+      posts = User.find_by_name(params[:name]).posts
+        posts_array << posts
     end
     respond_with posts_array
   end
